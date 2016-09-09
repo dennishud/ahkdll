@@ -1,0 +1,23 @@
+# -*- coding: utf-8 -*-
+
+import paramiko
+
+server_ip = '10.93.197.216'
+server_port=22
+server_user='root'
+server_passwd='REj#fvV9'
+
+ssh = paramiko.SSHClient()
+ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+ssh.connect(server_ip,server_port,server_user, server_passwd,look_for_keys=False)
+# ssh.connect(server_ip, username = server_user ,password=server_passwd, look_for_keys=False)
+stdin, stdout, stderr = ssh.exec_command("cd /var/log/")
+print stdout.readlines()
+print stderr.readlines()
+stdin, stdout, stderr = ssh.exec_command("pwd")
+print stdout.readlines()
+stdin, stdout, stderr = ssh.exec_command("ls /var/log/")
+print stdout.readlines()
+
+# t = paramiko.Transport((server_ip,server_port))
+# t.connect(username = server_user, password = server_passwd)
