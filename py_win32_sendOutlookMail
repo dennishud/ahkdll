@@ -1,0 +1,51 @@
+# -*- coding: utf-8 -*-
+import win32com.client as win32
+from ctypes import windll
+import autoit
+import time
+import thread
+import os
+from multiprocessing import Process
+
+def Outlook():
+    app='Outlook'
+    olook =win32.gencache.EnsureDispatch("%s.Application" %app)
+    mail=olook.CreateItem(win32.constants.olMailItem)
+    print "Outlook started"
+
+    #收件人
+    mail.Recipients.Add('hudai@huawei.com')
+    # 邮件主题
+    subj =mail.Subject = 'Test again'
+
+    body =["Dear Sir,"]
+    body.append("Hello world,")
+    mail.Body ='\r\n'.join(body)
+    mail.Send()
+    print("sendok")
+
+def AutoItClickWarning():
+    print "AutoItClickWarning:Started"
+    time.sleep(3)
+    autoit.win_activate("Microsoft Office Outlook")
+    time.sleep(3)
+    autoit.control_click("Microsoft Office Outlook", "Button3")
+    time.sleep(2)
+    autoit.control_click("Microsoft Office Outlook", "Button4")
+    time.sleep(2)
+    autoit.send("{enter}")
+    time.sleep(10)
+    autoit.control_click("Microsoft Office Outlook", "Button4")
+    autoit.send("{enter}")
+    print "AutoItClickWarning:Ended"
+
+if __name__ =="__main__":
+
+   # thread.start_new_thread(AutoItClickWarning,())
+   print "To start AutoItClickWarning"
+   p1 = Process(target=AutoItClickWarning, args=())
+   p1.start()
+   print "To start Outlook"
+   # thread.start_new_thread(Outlook,())
+   p2 = Process(target=Outlook, args=())
+   p2.start()
