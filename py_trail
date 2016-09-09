@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -16,3 +17,227 @@ from Tkinter import *
 from tkMessageBox import *
 from win32com.client import Dispatch
 import win32com.client
+
+
+class Temp(unittest.TestCase):
+    def setUp(self):
+        self.driver = webdriver.Chrome()
+        self.driver.implicitly_wait(30)
+        self.base_url = ""
+        self.verificationErrors = []
+        self.accept_next_alert = True
+    
+    def test_temp(self):
+
+        driver = self.driver
+
+        PathDictBase = {'alpha': 'http://xxxxx.alpha.tools.xxxxx.com/',
+                          'beta': 'http://xxxxx.beta.tools.xxxxx.com/',
+                          'gamma': 'http://xxxxx.gamma.tools.xxxxx.com/',
+                          'product': 'http://xxxxx.xxxxx.com/',
+                          }
+
+        PathDictUserMgt = {'alpha': 'usermanagement',
+                          'beta': 'usermanagement',
+                          'gamma': 'usermanagement',
+                          'product': 'usermanagement',
+                          }
+
+        # data = xlrd.open_workbook('E:\ForHWDesktop\PyTrail\CloudDragonUserAdd.xls',formatting_info=True)
+        # table = data.sheet_by_name(u'Sheet1')
+        xlApp = win32com.client.Dispatch('Excel.Application')
+        xlApp.Visible = True
+        xlApp.DisplayAlerts = False
+        xlBook = xlApp.Workbooks.Open(u'E:\ForHWDesktop\PyTrail\CloudDragonUserAdd.xls')
+        table = xlBook.Worksheets(u'Sheet1')
+
+        #Variant for 1st login
+        FirstLogin="Yes"
+
+        # #For update excel
+        # UpdateWb=copy(data)
+        # UpdateWs=UpdateWb.get_sheet(0)
+
+        cell_ToAdd_ColNum = 0+1
+        cell_Added_ColNum = 1+1
+        cell_User_ColNum = 2+1
+        cell_Env_ColNum = 3+1
+        cell_ProductToAdd_ColNum = 4+1
+        cell_GroupToAdd_ColNum = 5+1
+        cell_UserType_ColNum = 6+1
+
+        print cell_ToAdd_ColNum
+
+        cell_ToAdd = ""
+        cell_Added = ""
+        cell_User = ""
+        cell_Env = ""
+        cell_ProductToAdd = ""
+        cell_GroupToAdd = ""
+        cell_UserType=""
+
+        # 设置隐式等待 15秒
+        driver.implicitly_wait(5)
+
+        for i in range(1, 1000, 1):
+
+            cell_ToAdd = table.Cells(i, cell_ToAdd_ColNum).Value
+            cell_Added = table.Cells(i, cell_Added_ColNum).Value
+            cell_User = table.Cells(i, cell_User_ColNum).Value
+            cell_Env = table.Cells(i, cell_Env_ColNum).Value
+            cell_ProductToAdd = table.Cells(i, cell_ProductToAdd_ColNum).Value
+            cell_GroupToAdd = table.Cells(i, cell_GroupToAdd_ColNum).Value
+            cell_UserType = table.Cells(i, cell_UserType_ColNum).Value
+
+            print "Column:" + str(i)
+
+            if cell_ToAdd == "Yes":
+                if cell_Added == "No":
+
+                    driver.get(PathDictBase[cell_Env] + PathDictUserMgt[cell_Env])
+                    time.sleep(3)
+                    driver.maximize_window()
+
+                    if FirstLogin == "Yes":
+                        driver.find_element_by_name("uid").send_keys("xxxxx")
+                        driver.find_element_by_name("password").send_keys("xxxxx")
+                        driver.find_element_by_name("Submit").click()
+                        FirstLogin = "No"
+                        time.sleep(5)
+
+                    # cell_User=str(int(cell_User))
+                    print "Adding use: "+cell_User +" to "+cell_Env
+
+                    #选择Product
+                    try:
+                        Xpath = "//li/span[2][contains(text()," +"'" +cell_ProductToAdd + "'"+")]"
+                        #print "Product xPath:"+ Xpath
+                        driver.find_element_by_xpath(Xpath).click()
+                    except:
+                        print "Can't find product:"+cell_ProductToAdd
+
+                    time.sleep(2)
+
+                    #选择Group
+                    try:
+                        Xpath = "//div[@class='group-card-head']/div[contains(text()," +"'" +cell_GroupToAdd +"'" +")]"
+                        #print "Group xPath:"+ Xpath
+                        driver.find_element_by_xpath(Xpath).click()
+                    except:
+                        print "Can't find group:"+cell_GroupToAdd
+
+                    #Click Add member button
+                    Xpath = "//button[@ng-click='addMemberShow()']"
+                    driver.find_element_by_xpath(Xpath).click()
+                    time.sleep(2)
+
+                    #To Add member
+                    Xpath = "//div[@class='add-icon-member can-operate']"
+                    driver.find_element_by_xpath(Xpath).click()
+                    time.sleep(2)
+
+                    #input user name
+                    Xpath = "//input[@id='searchKeyName']"
+
+                    driver.find_element_by_xpath(Xpath).send_keys(cell_User)
+                    # driver.find_element_by_xpath(Xpath).click()
+                    # pyautogui.typewrite(cell_User)
+                    time.sleep(2)
+
+                    # pyautogui.alert(u'请剪切工号，再粘贴以规避搜索bug')
+
+                    #Select user
+                    try:
+                        Xpath = "//div[@class='member-search-select']/div/div"
+                        driver.find_element_by_xpath(Xpath).click()
+                    except:
+                        print "Can't find user:"+cell_User
+                    time.sleep(2)
+
+                    #Click blank area
+                    Xpath = "//div[@class='add-group-pop']"
+                    driver.find_element_by_xpath(Xpath).click()
+                    time.sleep(2)
+
+                    #Click Add
+                    try:
+                        Xpath = "//button[@ng-click='addMembers()']"
+                        driver.find_element_by_xpath(Xpath).click()
+                    except:
+                        print "Can't find Add button!"
+                    time.sleep(2)
+
+                    #用户权限类型默认为member，非member的话则进入修改程序
+                    if cell_UserType != "" and cell_UserType != "member":
+
+                        #如果是重复用户则需要点击关闭按钮
+                        try:
+                            Xpath = "//div[@ng-click='closeMember()']"
+                            driver.find_element_by_xpath(Xpath).click()
+                        except:
+                            print "new user to modify rights to:"+cell_UserType
+
+                        time.sleep(2)
+                        Xpath = "//div/input[@ng-model='currentSearchMember']"
+                        driver.find_element_by_xpath(Xpath).send_keys(cell_User)
+                        time.sleep(2)
+
+                        #pyautogui.alert(u'确定是否搜索到用户')
+
+                        try:
+                            #click edit
+                            Xpath = "//li/span[@title='edit member']"
+                            driver.find_element_by_xpath(Xpath).click()
+                            time.sleep(2)
+                            #把Role选项选出来
+                            Xpath = "//div[@id='role_select_chosen']"
+                            driver.find_element_by_xpath(Xpath).click()
+                            time.sleep(1)
+                            # 选择Role
+                            Xpath = "//div[@class='chosen-drop']/ul/li[contains(text(),"+"'" + cell_UserType + "'" + ")]"
+                            driver.find_element_by_xpath(Xpath).click()
+                            time.sleep(2)
+                            # 选择Confirm
+                            Xpath = "//button[@id='btnOK']"
+                            driver.find_element_by_xpath(Xpath).click()
+                            time.sleep(2)
+
+                            table.Cells(i, cell_Added_ColNum).Value = "Yes"
+                        except:
+                            print "can't find user:"+cell_User
+
+                    # UpdateWs.write(i,cell_Added_ColNum,"Yes")
+                    # UpdateWb.save('E:\ForHWDesktop\PyTrail\CloudDragonUserAdd.xls')
+                    xlBook.Save()
+
+                    # driver.find_element_by_xpath("//div[@class='selVersion']/div[1]").click()
+                    # pyautogui.alert(u'确认以执行下一个用例')
+                    # time.sleep(15)
+
+    def is_element_present(self, how, what):
+        try: self.driver.find_element(by=how, value=what)
+        except NoSuchElementException as e: return False
+        return True
+    
+    def is_alert_present(self):
+        try: self.driver.switch_to_alert()
+        except NoAlertPresentException as e: return False
+        return True
+    
+    def close_alert_and_get_its_text(self):
+        try:
+            alert = self.driver.switch_to_alert()
+            alert_text = alert.text
+            if self.accept_next_alert:
+                alert.accept()
+            else:
+                alert.dismiss()
+            return alert_text
+        finally: self.accept_next_alert = True
+    
+    def tearDown(self):
+        self.driver.quit()
+        self.assertEqual([], self.verificationErrors)
+
+if __name__ == "__main__":
+    unittest.main()
