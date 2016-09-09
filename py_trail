@@ -43,12 +43,12 @@ class Temp(unittest.TestCase):
                           'product': 'usermanagement',
                           }
 
-        # data = xlrd.open_workbook('E:\ForHWDesktop\PyTrail\CloudDragonUserAdd.xls',formatting_info=True)
+        # data = xlrd.open_workbook('E:\UserAdd.xls',formatting_info=True)
         # table = data.sheet_by_name(u'Sheet1')
         xlApp = win32com.client.Dispatch('Excel.Application')
         xlApp.Visible = True
         xlApp.DisplayAlerts = False
-        xlBook = xlApp.Workbooks.Open(u'E:\ForHWDesktop\PyTrail\CloudDragonUserAdd.xls')
+        xlBook = xlApp.Workbooks.Open(u'E:\UserAdd.xls')
         table = xlBook.Worksheets(u'Sheet1')
 
         #Variant for 1st login
