@@ -178,7 +178,7 @@ class Temp(unittest.TestCase):
                             # 参数页面截图
                             CurrentTime = time.strftime('%Y%m%d%H%M', time.localtime(time.time()))
                             CurrentTime = str(CurrentTime)
-                            pyautogui.screenshot('''C:\Users\h00327936\Documents\\''' + CurrentTime + cell_ScenarioName + cell_ServiceName + u'_创建参数' + '.png')
+                            pyautogui.screenshot('''C:\Users\xxx\Documents\\''' + CurrentTime + cell_ScenarioName + cell_ServiceName + u'_创建参数' + '.png')
 
                             pyautogui.alert(u'确认以创建流水线')
                             time.sleep(2)
@@ -196,7 +196,7 @@ class Temp(unittest.TestCase):
                             # 创建截图
                             CurrentTime = time.strftime('%Y%m%d%H%M', time.localtime(time.time()))
                             CurrentTime = str(CurrentTime)
-                            pyautogui.screenshot('''C:\Users\h00327936\Documents\\''' + CurrentTime + cell_ScenarioName + cell_ServiceName + u'_创建结果' + '.png')
+                            pyautogui.screenshot('''C:\Users\xxx\Documents\\''' + CurrentTime + cell_ScenarioName + cell_ServiceName + u'_创建结果' + '.png')
                             print "To start pipeline."
 
                             #到流水线执行
