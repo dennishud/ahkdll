@@ -1,0 +1,316 @@
+# -*- coding: utf-8 -*-
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import Select
+from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.support.ui import WebDriverWait
+import unittest, time, re
+import xlrd
+import xlwt
+from xlutils.copy import copy
+import pyperclip
+import pyscreeze
+from pywinauto import application
+import pyautogui
+from Tkinter import *
+from tkMessageBox import *
+import os
+import win32api
+
+class Temp(unittest.TestCase):
+    def setUp(self):
+        self.driver = webdriver.Chrome()
+        self.driver.implicitly_wait(30)
+        self.base_url = ""
+        self.verificationErrors = []
+        self.accept_next_alert = True
+    
+    def test_temp(self):
+
+        driver = self.driver
+
+        PathDictBase = {'alpha': 'http://xx.alpha.tools.xx.com/',
+                          'beta': 'http://xx.beta.tools.xx.com/',
+                          'gamma': 'http://xx.gamma.tools.xx.com/',
+                          'product': 'http://xx.xx.com/',
+                          }
+
+        PathDictServiceCreate = {'alpha': 'init/micro/create',
+                          'beta': 'init/micro/create',
+                          'gamma': 'init/micro/create',
+                          'product': 'init/micro/create',
+                          }
+
+        #cmd for smartide config
+        CMDDeleteGitConfig = '''del "C:\Program Files (x86)\Avenue SmartIDE\Dkit\home\plugins\gitlabDragon\\bin\config.properties"'''
+        CMDDeletePipelineConfig = '''del "C:\Program Files (x86)\Avenue SmartIDE\Dkit\home\plugins\pipelineDragon\bin\\bin\config.properties"'''
+
+        CMDToModifySmartIDEConfigGit = {'beta': '''copy "C:\Program Files (x86)\Avenue SmartIDE\Dkit\home\plugins\gitlabDragon\\bin\config.properties.beta" "C:\Program Files (x86)\Avenue SmartIDE\Dkit\home\plugins\gitlabDragon\\bin\config.properties"''',
+                                    'gamma': '''copy "C:\Program Files (x86)\Avenue SmartIDE\Dkit\home\plugins\gitlabDragon\\bin\config.properties.gamma" "C:\Program Files (x86)\Avenue SmartIDE\Dkit\home\plugins\gitlabDragon\\bin\config.properties"''',
+                                    'product': '''copy "C:\Program Files (x86)\Avenue SmartIDE\Dkit\home\plugins\gitlabDragon\\bin\config.properties.product" "C:\Program Files (x86)\Avenue SmartIDE\Dkit\home\plugins\gitlabDragon\\bin\config.properties"''',
+                           }
+
+        CMDToModifySmartIDEConfigPipeline = {'beta': '''copy "C:\Program Files (x86)\Avenue SmartIDE\Dkit\home\plugins\pipelineDragon\\bin\config.properties.beta" "C:\Program Files (x86)\Avenue SmartIDE\Dkit\home\plugins\pipelineDragon\\bin\config.properties"''',
+                                    'gamma': '''copy "C:\Program Files (x86)\Avenue SmartIDE\Dkit\home\plugins\pipelineDragon\\bin\config.properties.gamma" "C:\Program Files (x86)\Avenue SmartIDE\Dkit\home\plugins\pipelineDragon\\bin\config.properties"''',
+                                    'product': '''copy "C:\Program Files (x86)\Avenue SmartIDE\Dkit\home\plugins\pipelineDragon\\bin\config.properties.product" "C:\Program Files (x86)\Avenue SmartIDE\Dkit\home\plugins\pipelineDragon\\bin\config.properties"''',
+                           }
+
+        data = xlrd.open_workbook('E:DevCloud_SenarioTest.xls',formatting_info=True)
+        table = data.sheet_by_name(u'TestCase')
+
+        #For update excel
+        UpdateWb=copy(data)
+        UpdateWs=UpdateWb.get_sheet(0)
+
+        cell_ToSubmit_ColNum = 0
+        cell_Submitted_ColNum = 1
+        cell_EnvToTest_ColNum = 2
+        cell_ScenarioName_ColNum = 3
+        cell_ServiceName_ColNum = 4
+        cell_GitPrivateKey_ColNum = 5
+
+        cell_ToSubmit = ""
+        cell_Submitted = ""
+        cell_EnvToTest_ = ""
+        cell_ScenarioName = ""
+        cell_ServiceName = ""
+
+        # 设置隐式等待 15秒
+        driver.implicitly_wait(15)
+
+        for i in range(1, 1000, 1):
+            cell_ToSubmit = table.cell(i, cell_ToSubmit_ColNum).value
+            cell_Submitted = table.cell(i, cell_Submitted_ColNum).value
+            cell_EnvToTest = table.cell(i, cell_EnvToTest_ColNum).value
+            cell_ScenarioName = table.cell(i, cell_ScenarioName_ColNum).value
+            cell_ServiceName = table.cell(i, cell_ServiceName_ColNum).value
+            cell_GitPrivateKey = table.cell(i, cell_GitPrivateKey_ColNum).value
+            print "Column:" + str(i)
+
+            if cell_ToSubmit == "Yes":
+                if cell_Submitted == "No":
+                    if cell_ScenarioName == u'训战创建':
+
+                        driver.get(PathDictBase[cell_EnvToTest] + "init/home")
+                        driver.maximize_window()
+                        driver.find_element_by_name("uid").send_keys("xxx")
+                        driver.find_element_by_name("password").send_keys("xxx")
+                        driver.find_element_by_name("Submit").click()
+                        time.sleep(5)
+
+                #         # 先删除重名服务
+                #         driver.find_element_by_xpath("//div[@class='search-box search-arears']/input").send_keys(cell_ServiceName)
+                #         driver.find_element_by_xpath("//span[@ng-click='search_service()']").click()
+                #         time.sleep(3)
+                #
+                #         try:
+                #             driver.find_element_by_xpath("//img[@alt='delete']").click()
+                #             driver.find_element_by_id("btnOK").click()
+                #             print "Deleted service:" + cell_ServiceName
+                #             time.sleep(30)
+                #         except:
+                #             print "No exsiting service:"+cell_ServiceName
+                #
+                #         driver.get(PathDictBase[cell_EnvToTest]+PathDictServiceCreate[cell_EnvToTest])
+                #         time.sleep(3)
+                #
+                #         #选择待创建类型
+                #         driver.find_element_by_css_selector("div.box > span > img").click()
+                #         driver.find_element_by_css_selector("#SpringMVC > span > img").click()
+                #         driver.find_element_by_css_selector("div.cs-main > div.btn-box > button.btn-purple.current").click()
+                #
+                #         driver.find_element_by_id("serviceName").send_keys(cell_ServiceName)
+                #
+                #         # 设置product下拉菜单可见
+                #         js = 'document.getElementById("product-select").style.display="block";'
+                #         driver.execute_script(js)
+                #         # driver.find_element_by_xpath("//span[contains(text(),'CloudDragon产品')]").click()
+                #         # driver.find_element_by_xpath("//select[@id='product-select']/option[@value='1']").click()
+                #         driver.find_element_by_xpath("//option[contains(text(),'CloudDragon产品')]").click()
+                #
+                #         js = 'document.getElementById("service-select").style.display="block";'
+                #         driver.execute_script(js)
+                #         # driver.find_element_by_xpath("//span[contains(text(),'yrtest20160730')]").click()
+                #         driver.find_element_by_xpath("//select[@id='service-select']/option[@value='1']").click()
+                #
+                # ##        driver.find_element_by_css_selector("li.active-result.result-selected").click()
+                # ##        driver.find_element_by_css_selector("a.chosen-single.chosen-default > span").click()
+                # ##        driver.find_element_by_css_selector("#service_select_chosen > div.chosen-drop > ul.chosen-results > li.active-result.result-selected").click()
+                #         #选择数据库
+                #         driver.find_element_by_css_selector("div.type-card-icon.mysql").click()
+                #         driver.find_element_by_css_selector("div.type-card-icon.redis").click()
+                #
+                #         driver.find_element_by_xpath("//div[@id='micro-service']/div/div/div[3]/div[2]/div/div[2]/div[2]/div[2]/div/div/div[2]").click()
+                #         # driver.find_element_by_xpath("//div[@id='service-temp-list-container']/ul/li[2]").click()
+                #
+                #         #选择Repo product
+                #         Xpath = "//div[@id='repo_product_chosen']"
+                #         driver.find_element_by_xpath(Xpath).click()
+                #         time.sleep(2)
+                #
+                #         RepoProduct="Other"
+                #         Xpath = "//ul[@class='chosen-results']/li[contains(text()," + "'"+RepoProduct+ "'" + ")]"
+                #         driver.find_element_by_xpath(Xpath).click()
+                #         time.sleep(2)
+                #
+                #         #先把Template下拉菜单点击出来
+                #         driver.find_element_by_xpath("//div[@class='service-temp-detail-show']/span[@class='service-temp-name over-flow-ellipsis ng-binding']").click()
+                #         #选择模板
+                #         driver.find_element_by_xpath("//li[contains(text(),'service_template')]").click()
+                #
+                #         #选择部署系统
+                #         #for corenet
+                #         # driver.find_element_by_xpath("//div[@class='service-config-title-value']/div[4]/div/label").click()
+                #         #for container
+                #         driver.find_element_by_xpath("//div[@class='service-config-title-value']/div[1]/div/label").click()
+                #
+                #         #勾掉Gamma
+                #         # driver.find_element_by_xpath("//span[contains(text(),'Gamma')]").click()
+                #         pyautogui.alert(u'确认以创建流水线')
+                #         time.sleep(5)
+                #
+                #         # #点击Create
+                #         driver.find_element_by_xpath("//button[contains(text(),'Create')]").click()
+                #         time.sleep(15)
+                #         pyautogui.alert(u'观察创建流水线是否成功')
+                #
+                #         CurrentTime = time.strftime('%Y%m%d%H%M', time.localtime(time.time()))
+                #         CurrentTime = str(CurrentTime)
+                #         pyautogui.screenshot('''C:\Users\h00327936\Documents\\'''+cell_ScenarioName+CurrentTime+'.png')
+
+                        #前往流水线执行
+                        driver.get(PathDictBase[cell_EnvToTest] + "pipeline/pipeline/details/" + cell_ServiceName)
+                        time.sleep(5)
+
+                        #创建develop流水线
+                        pyautogui.alert(u'确认以创建develop流水线')
+
+                        #点击Copy
+                        Xpath = "//span[@id='goCopyID']"
+                        driver.find_element_by_xpath(Xpath).click()
+                        time.sleep(2)
+                        #修改dev流水线名字
+                        Xpath = "//input[@name='copyName']"
+                        PipelineCpName="dev_"+cell_ServiceName
+                        driver.find_element_by_xpath(Xpath).clear()
+                        driver.find_element_by_xpath(Xpath).send_keys(PipelineCpName)
+                        time.sleep(1)
+                        Xpath = "//button[@id='copyNameSaveID']"
+                        driver.find_element_by_xpath(Xpath).click()
+                        time.sleep(2)
+
+                        # pyautogui.alert(u'确认copy是否成功')
+                        #while 循环直到找到OK 按钮
+                        while (1):
+                            try:
+                                Xpath = "//button[@id='btn0']"
+                                driver.find_element_by_xpath(Xpath).click()
+                                time.sleep(2)
+                                break
+                            except:
+                                continue
+
+                        #创建成功，修改PostTask （Gerrit）
+                            #点击edit
+                        Xpath = "//div[@class='edit-edit']"
+                        driver.find_element_by_xpath(Xpath).click()
+                        time.sleep(1)
+
+                            #点击advanced
+                        Xpath = "//div[@class='ST-pipline-title-list']"
+                        driver.find_element_by_xpath(Xpath).click()
+                        time.sleep(1)
+
+                            #点出PostTask,选择Gerrit
+                        Xpath = "// span[@id='showPostTaskID']"
+                        driver.find_element_by_xpath(Xpath).click()
+                        time.sleep(1)
+
+                        Xpath = "// ul[@ng-show='isShowPostTask']/li[contains(text(), 'Gerrit')]"
+                        driver.find_element_by_xpath(Xpath).click()
+                        time.sleep(1)
+
+                            #点击Confirm
+                        Xpath = "// button[@id='saveWorkflowFunID']"
+                        driver.find_element_by_xpath(Xpath).click()
+                        time.sleep(1)
+
+                        Xpath = "// span[@class='edit-save-btn save-btn ng-binding']"
+                        driver.find_element_by_xpath(Xpath).click()
+                        time.sleep(1)
+
+                            #等待创建完成
+                        while (1):
+                            try:
+                                Xpath = "//button[@id='btn0']"
+                                driver.find_element_by_xpath(Xpath).click()
+                                time.sleep(2)
+                                break
+                            except:
+                                continue
+
+                        #修改SmartIDE配置文件，适配不同的测试环境
+                        os.popen(CMDDeleteGitConfig)
+                        time.sleep(1)
+                        os.popen(CMDToModifySmartIDEConfigGit[cell_EnvToTest])
+                        time.sleep(1)
+
+                        os.popen(CMDDeletePipelineConfig)
+                        time.sleep(1)
+                        os.popen(CMDToModifySmartIDEConfigPipeline[cell_EnvToTest])
+                        time.sleep(1)
+                        #启动SmartIDE，下载代码
+                        # os.system("C:\Program Files (x86)\Avenue SmartIDE\Dkit\CD-IDE\SmartIDE.exe")
+                        win32api.ShellExecute(0, 'open',
+                                              "C:\Program Files (x86)\Avenue SmartIDE\Dkit\CD-IDE\SmartIDE.exe", '', '',
+                                              1)
+
+                        pyautogui.alert(u'SmartIDE启动完成之后，下载代码>修改>提交')
+
+                        #修改文件，点击commit
+
+                        #CloudCode或iSource上，review修改并通过
+
+                        #检查Develop流水线是否自动启动
+
+
+                        #按Start pipeline，启动Master 流水线
+                        pyautogui.alert(u'确认以执行流水线')
+                        driver.find_element_by_xpath("//div[@ng-show='!isShowHistory']/span[4]").click()
+                        time.sleep(2)
+                        driver.find_element_by_xpath("//div[@class='selVersion']/div[1]").click()
+                        time.sleep(2)
+                        driver.find_element_by_xpath("//div[@class='button-group add-stage-btn btn']/button[2]").click()
+                        time.sleep(3)
+
+                        pyautogui.alert(u'确认以执行下一个用例')
+                        time.sleep(15)
+
+    def is_element_present(self, how, what):
+        try: self.driver.find_element(by=how, value=what)
+        except NoSuchElementException as e: return False
+        return True
+    
+    def is_alert_present(self):
+        try: self.driver.switch_to_alert()
+        except NoAlertPresentException as e: return False
+        return True
+    
+    def close_alert_and_get_its_text(self):
+        try:
+            alert = self.driver.switch_to_alert()
+            alert_text = alert.text
+            if self.accept_next_alert:
+                alert.accept()
+            else:
+                alert.dismiss()
+            return alert_text
+        finally: self.accept_next_alert = True
+    
+    def tearDown(self):
+        self.driver.quit()
+        self.assertEqual([], self.verificationErrors)
+
+if __name__ == "__main__":
+    unittest.main()
