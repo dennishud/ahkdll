@@ -1,0 +1,18 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import Select
+from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.support.ui import WebDriverWait
+import unittest, time, re
+import xlrd
+import xlwt
+from xlutils.copy import copy
+import pyperclip
+import pyscreeze
+from pywinauto import application
+import pyautogui
+from Tkinter import *
+from tkMessageBox import *
+from win32com.client import Dispatch
+import win32com.client
