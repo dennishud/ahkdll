@@ -1,0 +1,273 @@
+# -*- coding: utf-8 -*-
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import Select
+from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.support.ui import WebDriverWait
+import unittest, time, re
+import xlrd
+import xlwt
+from xlutils.copy import copy
+import pyperclip
+import pyscreeze
+from pywinauto import application
+import pyautogui
+from Tkinter import *
+from tkMessageBox import *
+
+class Temp(unittest.TestCase):
+    def setUp(self):
+        self.driver = webdriver.Chrome()
+        self.driver.implicitly_wait(30)
+        self.base_url = ""
+        self.verificationErrors = []
+        self.accept_next_alert = True
+    
+    def test_temp(self):
+
+        driver = self.driver
+
+        PathDictBase = {'alpha': 'http://xx.alpha.tools.xx.com/',
+                          'beta': 'http://xx.beta.tools.xx.com/',
+                          'gamma': 'http://xx.gamma.tools.xx.com/',
+                          'product': 'http://xx.xx.com/',
+                          }
+
+        PathDictServiceCreate = {'alpha': 'init/micro/import',
+                          'beta': 'init/micro/import',
+                          'gamma': 'init/micro/import',
+                          'product': 'init/micro/import',
+                          }
+
+        data = xlrd.open_workbook('SenarioTest.xls',formatting_info=True)
+        table = data.sheet_by_name(u'TestCase')
+
+        #For update excel
+        UpdateWb=copy(data)
+        UpdateWs=UpdateWb.get_sheet(0)
+
+        cell_ToSubmit_ColNum = 0
+        cell_Submitted_ColNum = 1
+        cell_EnvToTest_ColNum = 2
+        cell_ScenarioName_ColNum = 3
+        cell_ServiceName_ColNum = 4
+        cell_GitPrivateKey_ColNum = 5
+
+        cell_ToSubmit = ""
+        cell_Submitted = ""
+        cell_EnvToTest_ = ""
+        cell_ScenarioName = ""
+        cell_ServiceName = ""
+
+        # 设置隐式等待 15秒
+        driver.implicitly_wait(15)
+
+        for i in range(1, 1000, 1):
+            cell_ToSubmit = table.cell(i, cell_ToSubmit_ColNum).value
+            cell_Submitted = table.cell(i, cell_Submitted_ColNum).value
+            cell_EnvToTest = table.cell(i, cell_EnvToTest_ColNum).value
+            cell_ScenarioName = table.cell(i, cell_ScenarioName_ColNum).value
+            cell_ServiceName = table.cell(i, cell_ServiceName_ColNum).value
+            cell_GitPrivateKey = table.cell(i, cell_GitPrivateKey_ColNum).value
+            print "Column:" + str(i)
+
+            if cell_ToSubmit == "Yes":
+                if cell_Submitted == "No":
+                    if cell_ScenarioName == u'核心网导入':
+
+                        driver.get(PathDictBase[cell_EnvToTest] + "init/home")
+                        driver.maximize_window()
+                        driver.find_element_by_name("uid").send_keys("h00327936")
+                        driver.find_element_by_name("password").send_keys("Zz@7788250")
+                        driver.find_element_by_name("Submit").click()
+                        time.sleep(5)
+
+                        # 先删除重名服务
+                        driver.find_element_by_xpath("//div[@class='search-box search-arears']/input").send_keys(cell_ServiceName)
+                        driver.find_element_by_xpath("//span[@ng-click='search_service()']").click()
+                        time.sleep(3)
+
+                        try:
+                            driver.find_element_by_xpath("//img[@alt='delete']").click()
+                            driver.find_element_by_id("btnOK").click()
+                            print "Deleted service:" + cell_ServiceName
+                            time.sleep(15)
+                        except:
+                            print "No exsiting service:"+cell_ServiceName
+
+                        driver.get(PathDictBase[cell_EnvToTest]+PathDictServiceCreate[cell_EnvToTest])
+
+                        #选择待创建类型
+                        driver.find_element_by_css_selector("div.box > span > img").click()
+                        driver.find_element_by_css_selector("#SpringMVC > span > img").click()
+                        driver.find_element_by_css_selector("div.cs-main > div.btn-box > button.btn-purple.current").click()
+
+                        driver.find_element_by_id("serviceName").send_keys(cell_ServiceName)
+
+                        # 设置product下拉菜单可见
+                        js = 'document.getElementById("product-select").style.display="block";'
+                        driver.execute_script(js)
+                        # driver.find_element_by_xpath("//span[contains(text(),'CloudDragon产品')]").click()
+                        # driver.find_element_by_xpath("//select[@id='product-select']/option[@value='1']").click()
+                        driver.find_element_by_xpath("//option[contains(text(),'CloudDragon产品')]").click()
+
+                        js = 'document.getElementById("service-select").style.display="block";'
+                        driver.execute_script(js)
+                        # driver.find_element_by_xpath("//span[contains(text(),'yrtest20160730')]").click()
+                        driver.find_element_by_xpath("//select[@id='service-select']/option[@value='1']").click()
+
+                        # #设置TestCase source下拉菜单可见
+                        # js = 'document.getElementById("test-type-select").style.display="block";'
+                        # driver.execute_script(js)
+                        # driver.find_element_by_xpath("//select[@id='test-type-select']/option[@value='1']").click()
+                        # driver.find_element_by_id("tmss").send_keys("10.82.20.68:8082")
+
+                        #选择RepoType
+                        Xpath = "//div[@id='repo_type_select_chosen']"
+                        driver.find_element_by_xpath(Xpath).click()
+
+                        # Xpath = "//div[@class='chosen-drop']/ul/li[contains(text(),'" + cell_Module + "')]"
+                        Xpath = "//div[@class='chosen-drop']/ul/li[contains(text(),'iSource')]"
+                        driver.find_element_by_xpath(Xpath).click()
+
+                        #填写Git Path
+                        Xpath = "//input[@id='repoPath']"
+                        driver.find_element_by_xpath(Xpath).send_keys("http://rnd-isourceb.huawei.com/wWX323939/myomportal.git")
+                        #填写Git User
+                        Xpath = "//input[@id='user']"
+                        driver.find_element_by_xpath(Xpath).send_keys("xxx")
+                        #填写Git pwd
+                        Xpath = "//input[@id='psw']"
+                        driver.find_element_by_xpath(Xpath).send_keys("xxx")
+                        #点击Maven
+                        driver.find_element_by_xpath("//div[@id='micro-service']/div/div[1]/div[1]/div[2]/div[2]/div[1]/div[3]/div[2]/div[2]/div/div[1]/div[2]").click()
+                        #先把Template下拉菜单点击出来
+                        driver.find_element_by_xpath("//div[@class='service-temp-detail-show']/span[@class='service-temp-name over-flow-ellipsis ng-binding']").click()
+                        #选择模板
+                        driver.find_element_by_xpath("//li[contains(text(),'template_for_omportal')]").click()
+
+                        #选择部署系统
+                        #for corenet
+                        driver.find_element_by_xpath("//div[@class='service-config-title-value']/div[4]/div/label").click()
+                        #for container
+                        # driver.find_element_by_xpath("//div[@class='service-config-title-value']/div[1]/div/label").click()
+
+                        #勾掉Gamma
+                        # driver.find_element_by_xpath("//span[contains(text(),'Gamma')]").click()
+                        #参数页面截图
+                        CurrentTime = time.strftime('%Y%m%d%H%M', time.localtime(time.time()))
+                        CurrentTime = str(CurrentTime)
+                        pyautogui.screenshot('''C:\Users\xxx\Documents\\'''+CurrentTime+cell_ScenarioName+cell_ServiceName+u'_创建参数'+'.png')
+
+                        pyautogui.alert(u'确认以创建流水线')
+                        time.sleep(5)
+
+                        # #点击Create
+                        driver.find_element_by_xpath("//button[contains(text(),'Create')]").click()
+                        time.sleep(15)
+                        pyautogui.alert(u'观察创建流水线是否成功')
+
+                        #创建截图
+                        CurrentTime = time.strftime('%Y%m%d%H%M', time.localtime(time.time()))
+                        CurrentTime = str(CurrentTime)
+                        pyautogui.screenshot('''C:\Users\xxxx\Documents\\'''+CurrentTime+cell_ScenarioName+cell_ServiceName+u'_创建结果'+'.png')
+
+                        #新版本取消TMSS的支持
+                        if 0 > 1:
+
+                            # #设置TMSS
+                            driver.get(PathDictBase[cell_EnvToTest] + "APITest/APITest/testservices")
+                            #
+                            # #type service name to search
+                            driver.find_element_by_id("searchValue").clear()
+                            driver.find_element_by_id("searchValue").send_keys(cell_ServiceName)
+                            driver.find_element_by_id("searchBtn").click()
+
+                            # #等待搜索结果出现
+                            time.sleep(5)
+                            # #需要增加判断是否搜索到相应的服务
+                            try:
+                                driver.find_element_by_xpath("//div[@class='operation']").click()
+                                time.sleep(3)
+                                print "Test service found:" + cell_ServiceName
+                            except:
+                                print "No test service,try again:"+cell_ServiceName
+                                driver.find_element_by_id("searchValue").clear()
+                                driver.find_element_by_id("searchValue").send_keys(cell_ServiceName)
+                                driver.find_element_by_id("searchBtn").click()
+                                time.sleep(5)
+                                driver.find_element_by_xpath("//div[@class='operation']").click()
+                                time.sleep(3)
+
+
+                            #窗口最大化
+                            # driver.find_element_by_xpath("//div[@id='layui-layer-setwin']/a[2]").click()
+                            # driver.find_element_by_css_selector("#layui-layer8 > span > a.layui-layer-ico.layui-layer-max")
+
+                            driver.switch_to_frame("layui-layer-iframe3")
+                            # driver.find_element_by_xpath("//input[@id='sutNameTmss']").clear()
+                            # driver.find_element_by_xpath("//input[@id=g'sutNameTmss']").send_keys("cell_ServiceName")
+
+                            driver.find_element_by_id("sutNameTmss").clear()
+                            driver.find_element_by_id("sutNameTmss").send_keys(cell_ServiceName)
+
+                            driver.find_element_by_id("sutRepoUrlTmss").clear()
+                            driver.find_element_by_id("sutRepoUrlTmss").send_keys("/o2kpshc7ep/862o442sgt42/862o442t3ir1/862o442t3l91/862o443dkq8/")
+
+                            driver.find_element_by_id("tmssUsername").clear()
+
+                            driver.find_element_by_id("gitUrl").clear()
+                            driver.find_element_by_id("gitUrl").send_keys("git@rnd-isourceb.huawei.com:CGP/service_platform_test.git")
+
+                            driver.find_element_by_id("gitScriptDir").clear()
+                            driver.find_element_by_id("gitScriptDir").send_keys("FAROS_TEST/JavaTestScript/service/tmp_service/com/huawei/faros/test/tmp_service")
+
+                            driver.find_element_by_id("gitPrivateKey").clear()
+                            driver.find_element_by_id("gitPrivateKey").send_keys("-----"+cell_GitPrivateKey)
+                            time.sleep(8)
+                            pyautogui.alert(u'把窗口往上拖，让Submit按钮出现')
+                            time.sleep(5)
+                            driver.find_element_by_xpath("//li[@class='layui-form-li']/button").click()
+
+                        #到流水线执行
+                        driver.get(PathDictBase[cell_EnvToTest] + "pipeline/pipeline/details/" + cell_ServiceName)
+                        time.sleep(5)
+                        #按Start pipeline
+                        driver.find_element_by_xpath("//div[@ng-show='!isShowHistory']/span[4]").click()
+                        time.sleep(2)
+                        driver.find_element_by_xpath("//div[@class='selVersion']/div[1]").click()
+                        time.sleep(2)
+                        driver.find_element_by_xpath("//div[@class='button-group add-stage-btn btn']/button[2]").click()
+                        time.sleep(3)
+
+                        pyautogui.alert(u'确认以执行下一个用例')
+                        time.sleep(15)
+
+    def is_element_present(self, how, what):
+        try: self.driver.find_element(by=how, value=what)
+        except NoSuchElementException as e: return False
+        return True
+    
+    def is_alert_present(self):
+        try: self.driver.switch_to_alert()
+        except NoAlertPresentException as e: return False
+        return True
+    
+    def close_alert_and_get_its_text(self):
+        try:
+            alert = self.driver.switch_to_alert()
+            alert_text = alert.text
+            if self.accept_next_alert:
+                alert.accept()
+            else:
+                alert.dismiss()
+            return alert_text
+        finally: self.accept_next_alert = True
+    
+    def tearDown(self):
+        self.driver.quit()
+        self.assertEqual([], self.verificationErrors)
+
+if __name__ == "__main__":
+    unittest.main()
