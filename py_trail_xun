@@ -177,7 +177,7 @@ class Temp(unittest.TestCase):
                 #
                 #         CurrentTime = time.strftime('%Y%m%d%H%M', time.localtime(time.time()))
                 #         CurrentTime = str(CurrentTime)
-                #         pyautogui.screenshot('''C:\Users\h00327936\Documents\\'''+cell_ScenarioName+CurrentTime+'.png')
+                #         pyautogui.screenshot('''C:\Users\xxx\Documents\\'''+cell_ScenarioName+CurrentTime+'.png')
 
                         #前往流水线执行
                         driver.get(PathDictBase[cell_EnvToTest] + "pipeline/pipeline/details/" + cell_ServiceName)
@@ -261,9 +261,9 @@ class Temp(unittest.TestCase):
                         os.popen(CMDToModifySmartIDEConfigPipeline[cell_EnvToTest])
                         time.sleep(1)
                         #启动SmartIDE，下载代码
-                        # os.system("C:\Program Files (x86)\Avenue SmartIDE\Dkit\CD-IDE\SmartIDE.exe")
+                        # os.system("C:\Program Files (x86)\Avenue SmartIDE\Dkit\CD-IDE\xx.exe")
                         win32api.ShellExecute(0, 'open',
-                                              "C:\Program Files (x86)\Avenue SmartIDE\Dkit\CD-IDE\SmartIDE.exe", '', '',
+                                              "C:\Program Files (x86)\Avenue SmartIDE\Dkit\CD-IDE\xx.exe", '', '',
                                               1)
 
                         pyautogui.alert(u'SmartIDE启动完成之后，下载代码>修改>提交')
